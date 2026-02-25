@@ -3,53 +3,93 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CapCatcher</title>
+  <title>CapCatcher — NFL Cap Tracker</title>
   <meta name="description" content="CapCatcher: NFL cap tracker + decisions + needs + free agents + simulator." />
   <style>
     :root{
-      --bg:#0b0f17; --panel:#101827; --panel2:#0f1724; --text:#e8eefc; --muted:#a9b7d3;
-      --line:#1f2b44; --good:#29d391; --warn:#f5c84c; --bad:#ff5a6a; --brand:#7c5cff; --brand2:#42d3ff;
-      --shadow: 0 12px 30px rgba(0,0,0,.35); --radius:16px;
+      --bg:#0b0f17;
+      --panel:#101827;
+      --panel2:#0f1724;
+      --text:#e8eefc;
+      --muted:#a9b7d3;
+      --line:#1f2b44;
+      --good:#29d391;
+      --warn:#f5c84c;
+      --bad:#ff5a6a;
+      --brand:#7c5cff;
+      --brand2:#42d3ff;
+      --chip:#17233a;
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --radius:16px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     }
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0; font-family:var(--sans); color:var(--text);
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
       background:
         radial-gradient(1200px 600px at 20% 0%, rgba(124,92,255,.22), transparent 55%),
         radial-gradient(900px 500px at 80% 10%, rgba(66,211,255,.18), transparent 55%),
         linear-gradient(180deg, #070a10, var(--bg) 30%, #070a10);
     }
-    header{position:sticky; top:0; z-index:50; backdrop-filter: blur(14px);
-      background: rgba(7,10,16,.65); border-bottom:1px solid rgba(31,43,68,.65);}
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(14px);
+      background: rgba(7,10,16,.65);
+      border-bottom:1px solid rgba(31,43,68,.65);
+    }
     .wrap{max-width:1200px; margin:0 auto; padding:18px;}
-    .topbar{display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:space-between;}
+    .topbar{
+      display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+      justify-content:space-between;
+    }
     .brand{display:flex; align-items:center; gap:12px;}
-    .logo{width:40px;height:40px;border-radius:12px;
+    .logo{
+      width:40px;height:40px;border-radius:12px;
       background: conic-gradient(from 210deg, var(--brand), var(--brand2), var(--brand));
-      box-shadow: 0 10px 30px rgba(124,92,255,.25); position:relative;}
-    .logo:after{content:""; position:absolute; inset:9px; border-radius:10px;
-      background: rgba(7,10,16,.7); border:1px solid rgba(255,255,255,.08);}
-    h1{margin:0; font-size:18px; letter-spacing:.3px;}
-    .sub{font-size:12px; color:var(--muted); margin-top:2px}
+      box-shadow: 0 10px 30px rgba(124,92,255,.25);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius:10px;
+      background: rgba(7,10,16,.7);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .brand h1{margin:0;font-size:18px; letter-spacing:.3px}
+    .brand .sub{font-size:12px; color:var(--muted); margin-top:2px}
     .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
     input[type="search"], select{
-      background: rgba(16,24,39,.85); border:1px solid rgba(31,43,68,.9); color:var(--text);
-      padding:10px 12px; border-radius:12px; outline:none; min-width:220px;
+      background: rgba(16,24,39,.85);
+      border:1px solid rgba(31,43,68,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      outline:none;
+      min-width:220px;
     }
-    select{min-width:180px}
+    select{min-width:170px}
     .btn{
-      cursor:pointer; border:1px solid rgba(31,43,68,.9);
+      cursor:pointer;
+      border:1px solid rgba(31,43,68,.9);
       background: linear-gradient(180deg, rgba(124,92,255,.15), rgba(16,24,39,.95));
-      color:var(--text); padding:10px 12px; border-radius:12px; box-shadow: 0 10px 26px rgba(0,0,0,.2);
-      transition:.15s transform ease, .15s opacity ease; font-weight:700;
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.2);
+      transition:.15s transform ease, .15s opacity ease;
+      font-weight:800;
     }
     .btn:hover{transform: translateY(-1px)}
     .btn:active{transform: translateY(0px); opacity:.9}
     main{padding:18px 0 40px}
     .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:18px;}
     @media(max-width:1000px){ .grid{grid-template-columns:1fr} }
+
     .card{
       background: linear-gradient(180deg, rgba(16,24,39,.92), rgba(10,14,22,.92));
       border:1px solid rgba(31,43,68,.85);
@@ -57,21 +97,56 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
-    .hd{padding:14px; display:flex; align-items:center; justify-content:space-between; gap:10px;
-      border-bottom:1px solid rgba(31,43,68,.7); background: rgba(15,23,36,.7);}
-    .hd h2{margin:0;font-size:14px; letter-spacing:.3px}
-    .bd{padding:14px}
+    .card .hd{
+      padding:14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid rgba(31,43,68,.7);
+      background: rgba(15,23,36,.7);
+    }
+    .card .hd h2{margin:0;font-size:14px; letter-spacing:.3px}
+    .card .bd{padding:14px}
     .pill{
-      font-family:var(--mono); font-size:11px;
-      background: rgba(23,35,58,.75); border:1px solid rgba(31,43,68,.85);
-      padding:6px 8px; border-radius:999px; color:var(--muted); white-space:nowrap;
+      font-family:var(--mono);
+      font-size:11px;
+      background: rgba(23,35,58,.75);
+      border:1px solid rgba(31,43,68,.85);
+      padding:6px 8px;
+      border-radius:999px;
+      color:var(--muted);
+      white-space:nowrap;
     }
     .pill.good{color:var(--good); border-color: rgba(41,211,145,.35); background: rgba(41,211,145,.08)}
     .pill.warn{color:var(--warn); border-color: rgba(245,200,76,.35); background: rgba(245,200,76,.08)}
     .pill.bad{color:var(--bad); border-color: rgba(255,90,106,.35); background: rgba(255,90,106,.08)}
+
     .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
-    .small{font-size:12px}
     .muted{color:var(--muted)}
+    .small{font-size:12px}
+
+    .kpi{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+      margin-top:12px;
+    }
+    @media(max-width:700px){ .kpi{grid-template-columns: repeat(2, 1fr)} }
+    .kpi .box{
+      background: rgba(15,23,36,.6);
+      border:1px solid rgba(31,43,68,.7);
+      border-radius: 14px;
+      padding:12px;
+    }
+    .kpi .box .lbl{font-size:11px; color:var(--muted)}
+    .kpi .box .val{font-family:var(--mono); font-size:14px; margin-top:6px}
+
+    .sectionTitle{
+      margin:14px 0 8px;
+      font-size:12px;
+      color:var(--muted);
+      letter-spacing:.25px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+    }
     .list{display:grid; gap:10px;}
     .item{
       background: rgba(15,23,36,.55);
@@ -79,16 +154,28 @@
       border-radius:14px;
       padding:10px 12px;
     }
-    .item .top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
-    .nm{font-weight:800; font-size:13px}
-    .meta{font-size:11px; color:var(--muted); margin-top:4px; line-height:1.35}
-    .money{font-family:var(--mono); font-size:12px}
+    .item .top{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+    }
+    .item .nm{font-weight:900; font-size:13px}
+    .item .meta{font-size:11px; color:var(--muted); margin-top:4px; line-height:1.35}
+    .item .money{font-family:var(--mono); font-size:12px}
     .chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
     .chip{
-      background: rgba(23,35,58,.65); border:1px solid rgba(31,43,68,.7);
-      border-radius:999px; padding:5px 8px; font-size:11px; color:var(--muted); white-space:nowrap;
+      background: rgba(23,35,58,.65);
+      border:1px solid rgba(31,43,68,.7);
+      border-radius:999px;
+      padding:5px 8px;
+      font-size:11px;
+      color:var(--muted);
+      white-space:nowrap;
     }
-    .teams{display:grid; grid-template-columns: repeat(2, 1fr); gap:12px;}
+
+    .teams{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:12px;
+    }
     @media(max-width:750px){ .teams{grid-template-columns:1fr} }
     details.team{
       border-radius: var(--radius);
@@ -97,20 +184,67 @@
       overflow:hidden;
     }
     details.team > summary{
-      list-style:none; cursor:pointer; padding:14px; display:flex; align-items:center; justify-content:space-between; gap:10px; user-select:none;
+      list-style:none;
+      cursor:pointer;
+      padding:14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      user-select:none;
     }
     details.team > summary::-webkit-details-marker{display:none}
+    .teamName{font-weight:950}
     .summaryRight{display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
     .divider{height:1px; background:rgba(31,43,68,.7)}
     .teamBody{padding:14px}
-    .twoCol{display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
+    .twoCol{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
     @media(max-width:900px){ .twoCol{grid-template-columns:1fr} }
-    .mini{background: rgba(15,23,36,.55); border:1px solid rgba(31,43,68,.65); border-radius: 14px; padding:12px;}
+    .mini{
+      background: rgba(15,23,36,.55);
+      border:1px solid rgba(31,43,68,.65);
+      border-radius: 14px;
+      padding:12px;
+    }
     .mini h3{margin:0 0 8px; font-size:12px; color:var(--muted); letter-spacing:.25px}
-    .table{width:100%; border-collapse:collapse; font-size:12px;}
-    .table th, .table td{padding:8px 6px; border-bottom:1px solid rgba(31,43,68,.55); text-align:left; vertical-align:top;}
-    .table th{color:var(--muted); font-weight:600; font-size:11px}
+    .table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+    .table th, .table td{
+      padding:8px 6px;
+      border-bottom:1px solid rgba(31,43,68,.55);
+      text-align:left;
+      vertical-align:top;
+    }
+    .table th{color:var(--muted); font-weight:650; font-size:11px}
     .right{text-align:right}
+
+    .field label{display:block; font-size:11px; color:var(--muted); margin:2px 0 6px}
+    .field input, .field select{
+      width:100%;
+      min-width:unset;
+      background: rgba(16,24,39,.85);
+      border:1px solid rgba(31,43,68,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      outline:none;
+    }
+    .simRow{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr .8fr;
+      gap:10px;
+      align-items:end;
+      margin-top:10px;
+    }
+    @media(max-width:800px){ .simRow{grid-template-columns:1fr} }
+    .note{font-size:11px; color:var(--muted); margin-top:8px; line-height:1.35;}
+    .hr{height:1px;background:rgba(31,43,68,.6); margin:12px 0}
+    .footer{margin-top:18px; font-size:12px; color:var(--muted); text-align:center;}
+
     .tagBtn{
       background: rgba(23,35,58,.55);
       border:1px solid rgba(31,43,68,.8);
@@ -119,19 +253,22 @@
       padding:8px 10px;
       cursor:pointer;
       font-size:12px;
-      font-weight:800;
-      white-space:nowrap;
+      font-weight:900;
     }
-    .tagBtn.on{border-color: rgba(124,92,255,.55); box-shadow: 0 0 0 2px rgba(124,92,255,.18) inset;}
-    .avatarRow{display:flex; align-items:center; gap:10px;}
-    .avatar{
+    .tagBtn.on{
+      border-color: rgba(124,92,255,.55);
+      box-shadow: 0 0 0 2px rgba(124,92,255,.18) inset;
+    }
+
+    .avatarRow{display:flex; gap:10px; align-items:center;}
+    img.avatar{
       width:40px; height:40px; border-radius:14px;
       border:1px solid rgba(31,43,68,.8);
-      object-fit:cover; background: rgba(23,35,58,.45);
+      object-fit:cover;
+      background: rgba(23,35,58,.45);
+      flex:0 0 auto;
     }
-    .note{font-size:11px; color:var(--muted); margin-top:8px; line-height:1.35;}
-    .hr{height:1px;background:rgba(31,43,68,.6); margin:12px 0}
-    .footer{margin-top:18px; font-size:12px; color:var(--muted); text-align:center;}
+
     .toast{
       position:fixed; right:16px; bottom:16px;
       background: rgba(16,24,39,.95);
@@ -144,7 +281,7 @@
       display:none;
       z-index:99;
     }
-    .toast .t{font-weight:900; font-size:12px}
+    .toast .t{font-weight:950; font-size:12px}
     .toast .m{font-size:12px; color:var(--muted); margin-top:4px; line-height:1.35}
   </style>
 </head>
@@ -156,7 +293,7 @@
         <div class="logo" aria-hidden="true"></div>
         <div>
           <h1>CapCatcher</h1>
-          <div class="sub">Real names + photos via JSON in your repo</div>
+          <div class="sub">Single-file build (all data embedded) — deploy to Vercel instantly</div>
         </div>
       </div>
 
@@ -179,34 +316,51 @@
   <div class="grid">
     <section class="card">
       <div class="hd">
-        <h2>Leaguewide</h2>
-        <span class="pill" id="lastUpdated">loading…</span>
+        <h2>Leaguewide Boards</h2>
+        <span class="pill" id="lastUpdated">—</span>
       </div>
       <div class="bd">
         <div class="row">
           <span class="pill" id="leagueCap">League Cap: —</span>
           <span class="pill" id="leagueAvgHealth">Avg Health: —</span>
-          <span class="pill">Tip: Compare pins up to 4 teams</span>
+          <span class="pill" id="compareHint">Tip: toggle Compare to pin teams</span>
         </div>
 
-        <div class="hr"></div>
+        <div class="kpi">
+          <div class="box">
+            <div class="lbl">Teams “Healthy”</div>
+            <div class="val" id="kpiGood">—</div>
+          </div>
+          <div class="box">
+            <div class="lbl">Teams “Tight”</div>
+            <div class="val" id="kpiWarn">—</div>
+          </div>
+          <div class="box">
+            <div class="lbl">Teams “In Trouble”</div>
+            <div class="val" id="kpiBad">—</div>
+          </div>
+          <div class="box">
+            <div class="lbl">Most Dead Money</div>
+            <div class="val" id="kpiDead">—</div>
+          </div>
+        </div>
 
-        <div class="row" style="justify-content:space-between">
-          <div class="small muted">Top 10 Free Agents</div>
+        <div class="sectionTitle">
+          <span>Top 10 Free Agents</span>
           <span class="pill">tap Follow</span>
         </div>
         <div class="list" id="freeAgents"></div>
 
         <div class="hr"></div>
 
-        <div class="row" style="justify-content:space-between">
-          <div class="small muted">GM Rankings (derived)</div>
+        <div class="sectionTitle">
+          <span>GM Rankings (derived score)</span>
           <span class="pill">demo formula</span>
         </div>
         <div class="list" id="gmRankings"></div>
 
         <div class="footer">
-          Data source is your repo JSON. Photos can be hosted URLs or local /assets.
+          This version will never be blank because it does not fetch external files.
         </div>
       </div>
     </section>
@@ -217,18 +371,22 @@
         <span class="pill">localStorage</span>
       </div>
       <div class="bd">
-        <div class="row" style="justify-content:space-between">
-          <div class="small muted">Compare Tray</div>
+        <div class="sectionTitle">
+          <span>Compare Tray</span>
           <span class="pill" id="compareCount">0 pinned</span>
         </div>
         <div class="list" id="compareTray"></div>
 
         <div class="hr"></div>
 
-        <div class="row" style="justify-content:space-between">
-          <div class="small muted">Alerts</div>
+        <div class="sectionTitle">
+          <span>Smart Alerts</span>
           <span class="pill">local-only</span>
         </div>
+        <div class="small muted">
+          Follow teams / free agents and you’ll get local alerts when you simulate moves.
+        </div>
+        <div class="hr"></div>
         <div class="list" id="alertsList"></div>
       </div>
     </aside>
@@ -244,7 +402,9 @@
     </div>
   </section>
 
-  <div class="footer">CapCatcher © <span id="year"></span></div>
+  <div class="footer">
+    CapCatcher © <span id="year"></span> — single-file deployable demo (inline data)
+  </div>
 </main>
 
 <div class="toast" id="toast">
@@ -253,20 +413,170 @@
 </div>
 
 <script>
-/**
- * CapCatcher (Repo JSON edition)
- * - Loads: /data/league.json, /data/teams.json, /data/players.json, /data/free_agents.json
- * - Stores: follows, compare pins, alerts, simulations in localStorage
- */
+/* =========================
+   1) INLINE DATA (EDIT HERE)
+   ========================= */
+
+const DATA = (() => {
+  const nowYear = new Date().getFullYear();
+
+  const league = { year: nowYear, cap: 255.4, lastUpdated: new Date().toISOString().slice(0,10) };
+
+  const TEAM_NAMES = [
+    "Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills","Carolina Panthers","Chicago Bears","Cincinnati Bengals","Cleveland Browns",
+    "Dallas Cowboys","Denver Broncos","Detroit Lions","Green Bay Packers","Houston Texans","Indianapolis Colts","Jacksonville Jaguars","Kansas City Chiefs",
+    "Las Vegas Raiders","Los Angeles Chargers","Los Angeles Rams","Miami Dolphins","Minnesota Vikings","New England Patriots","New Orleans Saints","New York Giants",
+    "New York Jets","Philadelphia Eagles","Pittsburgh Steelers","San Francisco 49ers","Seattle Seahawks","Tampa Bay Buccaneers","Tennessee Titans","Washington Commanders"
+  ];
+
+  const NEED_POOL = ["QB","RB","WR","TE","OT","IOL","EDGE","DT","LB","CB","S","K"];
+
+  const slug = (s)=>s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+
+  // Some real examples (you can add more)
+  const realPlayers = [
+    // Chiefs (real names + ESPN headshots)
+    { id:"patrick-mahomes", name:"Patrick Mahomes", pos:"QB", teamId:"kansas-city-chiefs", photoUrl:"https://a.espncdn.com/i/headshots/nfl/players/full/3139477.png", capHit:37.0, guarantees:80.0, yearsLeft:4 },
+    { id:"travis-kelce", name:"Travis Kelce", pos:"TE", teamId:"kansas-city-chiefs", photoUrl:"https://a.espncdn.com/i/headshots/nfl/players/full/15847.png", capHit:19.0, guarantees:10.0, yearsLeft:2 },
+    { id:"chris-jones", name:"Chris Jones", pos:"DT", teamId:"kansas-city-chiefs", photoUrl:"https://a.espncdn.com/i/headshots/nfl/players/full/3044859.png", capHit:27.0, guarantees:40.0, yearsLeft:3 },
+
+    // Bengals (example)
+    { id:"joe-burrow", name:"Joe Burrow", pos:"QB", teamId:"cincinnati-bengals", photoUrl:"https://a.espncdn.com/i/headshots/nfl/players/full/3915511.png", capHit:29.0, guarantees:120.0, yearsLeft:5 },
+    { id:"ja-marr-chase", name:"Ja'Marr Chase", pos:"WR", teamId:"cincinnati-bengals", photoUrl:"https://a.espncdn.com/i/headshots/nfl/players/full/4362628.png", capHit:10.5, guarantees:30.0, yearsLeft:2 },
+
+    // Bills (example)
+    { id:"josh-allen", name:"Josh Allen", pos:"QB", teamId:"buffalo-bills", photoUrl:"https://a.espncdn.com/i/headshots/nfl/players/full/3918298.png", capHit:30.0, guarantees:100.0, yearsLeft:4 }
+  ];
+
+  // Generate placeholder players so every team has at least top 3 players (so UI is never blank)
+  const players = [...realPlayers];
+  TEAM_NAMES.forEach((teamName, idx) => {
+    const teamId = slug(teamName);
+    // ensure each team has 6 placeholder players if not already
+    const existing = players.filter(p=>p.teamId===teamId).length;
+    const needed = Math.max(0, 6 - existing);
+    for(let i=0; i<needed; i++){
+      const n = i + 1;
+      const pos = ["QB","WR","EDGE","CB","OT","DT"][i] || "LB";
+      players.push({
+        id: `${teamId}-p${n}`,
+        name: `${teamName.split(" ")[0]} Player ${n}`,
+        pos,
+        teamId,
+        photoUrl: "", // add your own or stable URLs
+        capHit: +(14 + ((idx+i)%9)*2.1).toFixed(1),
+        guarantees: +(20 + ((idx+i)%8)*6.0).toFixed(1),
+        yearsLeft: 1 + ((idx+i)%4)
+      });
+    }
+  });
+
+  const playerById = (id)=>players.find(p=>p.id===id);
+
+  function seededTeam(teamName, idx){
+    const teamId = slug(teamName);
+
+    const baseCapSpace = 8 + (idx % 9) * 3.2;
+    const deadMoney = 6 + ((idx*7) % 12) * 2.1;
+    const rollover = 2 + ((idx*5) % 10) * 1.3;
+    const topSpendPct = 18 + ((idx*3) % 16);
+
+    // pick top 3 by capHit for that team
+    const teamPlayers = players.filter(p=>p.teamId===teamId).sort((a,b)=>(b.capHit||0)-(a.capHit||0));
+    const top3 = teamPlayers.slice(0,3).map(p=>p.id);
+
+    const needs = [
+      NEED_POOL[(idx*2)%NEED_POOL.length],
+      NEED_POOL[(idx*2+5)%NEED_POOL.length],
+      NEED_POOL[(idx*2+9)%NEED_POOL.length],
+    ];
+
+    // Decisions: choose from team roster
+    const d1 = teamPlayers[1] || playerById(top3[1]) || teamPlayers[0];
+    const d2 = teamPlayers[2] || playerById(top3[2]) || teamPlayers[0];
+    const d3 = teamPlayers[0] || playerById(top3[0]);
+
+    const decisions = [
+      { playerId: d1?.id || top3[0], action:"Re-sign", status:"UFA", estAAV: +(15 + (idx%6)*1.2).toFixed(1) },
+      { playerId: d2?.id || top3[1], action:"Release", status:"Cut candidate", savings: +(8 + (idx%7)*1.1).toFixed(1), deadMoney: +(4 + (idx%5)*1.0).toFixed(1) },
+      { playerId: d3?.id || top3[2], action:"Franchise", status:"Tag candidate", tagCost: +(18 + (idx%5)*2.0).toFixed(1) }
+    ];
+
+    // Cap health heuristic
+    const score = Math.max(0, Math.min(100,
+      70
+      + (baseCapSpace - 15)*1.2
+      + (rollover - 6)*1.0
+      - (deadMoney - 14)*1.1
+      - (topSpendPct - 24)*0.9
+    ));
+
+    const cap = league.cap;
+    const projection = [0,1,2].map(y=>{
+      const capY = +(cap * Math.pow(1.07, y)).toFixed(1);
+      const commitments = +(capY * (0.83 + ((idx+y)%6)*0.01)).toFixed(1);
+      const dead = +(deadMoney * (1 - y*0.18)).toFixed(1);
+      const space = +(capY - commitments - dead).toFixed(1);
+      return { year: league.year + y, cap: capY, commitments, dead, space };
+    });
+
+    return {
+      id: teamId,
+      name: teamName,
+      capSpace: +baseCapSpace.toFixed(1),
+      deadMoney: +deadMoney.toFixed(1),
+      rollover: +rollover.toFixed(1),
+      topSpendPct,
+      capHealthScore: Math.round(score),
+      topCapHitsPlayerIds: top3,
+      decisions,
+      needs,
+      projection
+    };
+  }
+
+  const teams = TEAM_NAMES.map(seededTeam);
+
+  // overwrite Chiefs (and any other team you want) with more “real” top3/decisions if you add real players
+  const chiefs = teams.find(t=>t.id==="kansas-city-chiefs");
+  if(chiefs){
+    chiefs.topCapHitsPlayerIds = ["patrick-mahomes","chris-jones","travis-kelce"];
+    chiefs.decisions = [
+      { playerId:"chris-jones", action:"Re-sign", status:"UFA", estAAV: 28.0 },
+      { playerId:"travis-kelce", action:"Release", status:"Cut candidate", savings: 10.5, deadMoney: 3.2 },
+      { playerId:"patrick-mahomes", action:"Franchise", status:"Tag candidate", tagCost: 0.0 }
+    ];
+    chiefs.needs = ["WR","OT","CB"];
+  }
+
+  const freeAgents = [
+    { name:"Tee Higgins", pos:"WR", age:27, prevTeam:"CIN", estAAV:24.0, tier:"Tier 1", photoUrl:"https://a.espncdn.com/i/headshots/nfl/players/full/4241474.png" },
+    { name:"Kirk Cousins", pos:"QB", age:37, prevTeam:"ATL", estAAV:18.0, tier:"Tier 1", photoUrl:"https://a.espncdn.com/i/headshots/nfl/players/full/14880.png" },
+    { name:"Chris Jones", pos:"DT", age:31, prevTeam:"KC", estAAV:25.0, tier:"Tier 1", photoUrl:"https://a.espncdn.com/i/headshots/nfl/players/full/3044859.png" },
+    { name:"Justin Madubuike", pos:"DT", age:28, prevTeam:"BAL", estAAV:22.0, tier:"Tier 1", photoUrl:"" },
+    { name:"Brian Burns", pos:"EDGE", age:28, prevTeam:"CAR", estAAV:24.0, tier:"Tier 1", photoUrl:"" },
+    { name:"L'Jarius Sneed", pos:"CB", age:29, prevTeam:"KC", estAAV:20.0, tier:"Tier 1", photoUrl:"" },
+    { name:"Tyron Smith", pos:"OT", age:35, prevTeam:"DAL", estAAV:10.0, tier:"Tier 2", photoUrl:"" },
+    { name:"Mike Evans", pos:"WR", age:33, prevTeam:"TB", estAAV:18.0, tier:"Tier 2", photoUrl:"" },
+    { name:"Saquon Barkley", pos:"RB", age:29, prevTeam:"NYG", estAAV:12.0, tier:"Tier 2", photoUrl:"" },
+    { name:"Antoine Winfield Jr.", pos:"S", age:28, prevTeam:"TB", estAAV:16.0, tier:"Tier 2", photoUrl:"" }
+  ];
+
+  return { league, teams, players, freeAgents };
+})();
+
+/* =========================
+   2) APP LOGIC
+   ========================= */
 
 const by = (id)=>document.getElementById(id);
 by("year").textContent = new Date().getFullYear();
 
-const STORAGE_KEY = "capcatcher_repojson_v1";
-
+const STORAGE_KEY = "capcatcher_singlefile_v1";
 const fmtMoney = (n) => {
-  const sign = n < 0 ? "-" : "";
+  const sign = Number(n) < 0 ? "-" : "";
   const abs = Math.abs(Number(n) || 0);
+  if(abs >= 1000) return sign + "$" + (abs/1000).toFixed(1) + "B";
   return sign + "$" + abs.toFixed(1) + "M";
 };
 const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
@@ -280,23 +590,23 @@ const toast = (title, message) => {
   toast._t = setTimeout(()=> el.style.display="none", 3200);
 };
 
-function loadLocal(){
+function loadState(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : null;
   }catch{ return null; }
 }
-function saveLocal(obj){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+function saveState(s){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
 }
 
-let local = loadLocal() || {
-  follows: { teams: {}, players: {}, freeAgents: {} },
+let state = loadState() || {
+  follows: { teams: {}, freeAgents: {} },
   comparePins: [],
   alerts: [],
   sim: {} // { [teamId]: [moves] }
 };
-saveLocal(local);
+saveState(state);
 
 function capHealthBucket(score){
   if(score >= 67) return "good";
@@ -309,99 +619,107 @@ function capHealthPill(score){
   return `<span class="pill ${b}">Health ${score} • ${label}</span>`;
 }
 
-function addAlert(kind, title, body){
-  const entry = { ts: Date.now(), kind, title, body };
-  local.alerts.unshift(entry);
-  local.alerts = local.alerts.slice(0, 30);
-  saveLocal(local);
-  renderAlerts();
-  toast(title, body);
+function playerById(id){
+  return DATA.players.find(p=>p.id===id);
 }
-
-async function loadJson(path){
-  const res = await fetch(path, { cache: "no-store" });
-  if(!res.ok) throw new Error(`Failed to load ${path} (${res.status})`);
-  return res.json();
-}
-
-let league = null;
-let teams = [];
-let players = [];
-let freeAgents = [];
-
-function playerById(id){ return players.find(p=>p.id===id); }
 
 function deriveGmScore(team){
-  // Simple: cap health + low dead + low concentration
+  // demo "GM" score
   const s = clamp(
-    team.capHealthScore
-    + (20 - team.deadMoney) * 0.8
-    - Math.max(0, team.topSpendPct - 26) * 1.2
+    Number(team.capHealthScore)
+    + (20 - Number(team.deadMoney)) * 0.8
+    - Math.max(0, Number(team.topSpendPct) - 26) * 1.2
     , 0, 100
   );
   return Math.round(s);
 }
 
+function addAlert(kind, title, body){
+  const entry = { ts: Date.now(), kind, title, body };
+  state.alerts.unshift(entry);
+  state.alerts = state.alerts.slice(0, 30);
+  saveState(state);
+  renderAlerts();
+  toast(title, body);
+}
+
+function toggleFollowTeam(teamId){
+  state.follows.teams[teamId] = !state.follows.teams[teamId];
+  saveState(state);
+  renderTeams();
+}
+function toggleFollowFA(name){
+  state.follows.freeAgents[name] = !state.follows.freeAgents[name];
+  saveState(state);
+  renderFreeAgents();
+}
+
+function togglePin(teamId){
+  const i = state.comparePins.indexOf(teamId);
+  if(i>=0) state.comparePins.splice(i,1);
+  else {
+    if(state.comparePins.length >= 4){
+      toast("Compare tray full", "You can pin up to 4 teams.");
+      return;
+    }
+    state.comparePins.push(teamId);
+  }
+  saveState(state);
+  renderCompareTray();
+  renderTeams();
+}
+
 function computeSimAdjusted(team){
-  const moves = local.sim[team.id] || [];
+  const moves = state.sim[team.id] || [];
   let capSpace = Number(team.capSpace);
   let deadMoney = Number(team.deadMoney);
+
   for(const m of moves){
-    if(m.type === "Cut" || m.type === "Restructure" || m.type === "Extend"){
+    if(m.type === "Cut"){
       capSpace += m.value;
-      deadMoney += (m.dead || 0);
-    } else if(m.type === "Franchise"){
+      deadMoney += m.dead;
+    }else if(m.type === "Restructure"){
+      capSpace += m.value;
+      deadMoney += m.dead;
+    }else if(m.type === "Extend"){
+      capSpace += m.value;
+    }else if(m.type === "Franchise"){
       capSpace -= m.value;
     }
   }
-  // Re-score (rough)
+
   const score = clamp(
     Number(team.capHealthScore)
     + (capSpace - Number(team.capSpace)) * 0.8
     - (deadMoney - Number(team.deadMoney)) * 0.7
     , 0, 100
   );
+
   return { capSpace:+capSpace.toFixed(1), deadMoney:+deadMoney.toFixed(1), capHealthScore:Math.round(score), moves };
 }
 
-function togglePin(teamId){
-  const i = local.comparePins.indexOf(teamId);
-  if(i>=0) local.comparePins.splice(i,1);
-  else{
-    if(local.comparePins.length >= 4){
-      toast("Compare tray full", "Pin up to 4 teams.");
-      return;
-    }
-    local.comparePins.push(teamId);
-  }
-  saveLocal(local);
-  renderCompareTray();
-  renderTeams();
-}
-
-function toggleFollowTeam(teamId){
-  local.follows.teams[teamId] = !local.follows.teams[teamId];
-  saveLocal(local);
-  renderTeams();
-}
-function toggleFollowFA(name){
-  local.follows.freeAgents[name] = !local.follows.freeAgents[name];
-  saveLocal(local);
-  renderFreeAgents();
-}
-
 function renderLeague(){
-  by("leagueCap").textContent = `League Cap (${league.year}): ${fmtMoney(league.cap)}`;
-  const avg = Math.round(teams.reduce((a,t)=>a+Number(t.capHealthScore||0),0)/Math.max(1,teams.length));
+  by("leagueCap").textContent = `League Cap (${DATA.league.year}): ${fmtMoney(DATA.league.cap)}`;
+  by("lastUpdated").textContent = `Updated: ${DATA.league.lastUpdated}`;
+
+  const avg = Math.round(DATA.teams.reduce((a,t)=>a+Number(t.capHealthScore),0)/DATA.teams.length);
   by("leagueAvgHealth").textContent = `Avg Health: ${avg}`;
-  by("lastUpdated").textContent = league.lastUpdated || "loaded";
+
+  const buckets = {good:0,warn:0,bad:0};
+  DATA.teams.forEach(t=>buckets[capHealthBucket(Number(t.capHealthScore))]++);
+  by("kpiGood").textContent = buckets.good;
+  by("kpiWarn").textContent = buckets.warn;
+  by("kpiBad").textContent = buckets.bad;
+
+  const mostDead = [...DATA.teams].sort((a,b)=>Number(b.deadMoney)-Number(a.deadMoney))[0];
+  by("kpiDead").textContent = `${mostDead.name.split(" ").slice(-1)[0]} ${fmtMoney(mostDead.deadMoney)}`;
 }
 
 function renderFreeAgents(){
   const el = by("freeAgents");
   el.innerHTML = "";
-  freeAgents.slice(0,10).forEach(fa=>{
-    const followed = !!local.follows.freeAgents[fa.name];
+  DATA.freeAgents.slice(0,10).forEach(fa=>{
+    const followed = !!state.follows.freeAgents[fa.name];
     const div = document.createElement("div");
     div.className = "item";
     div.innerHTML = `
@@ -423,7 +741,7 @@ function renderFreeAgents(){
     `;
     div.querySelector("button").addEventListener("click", ()=>{
       toggleFollowFA(fa.name);
-      addAlert("follow", "Free agent follow updated", `${fa.name} is now ${local.follows.freeAgents[fa.name] ? "followed" : "unfollowed"}.`);
+      addAlert("follow", "Free agent follow updated", `${fa.name} is now ${state.follows.freeAgents[fa.name] ? "followed" : "unfollowed"}.`);
     });
     el.appendChild(div);
   });
@@ -432,7 +750,8 @@ function renderFreeAgents(){
 function renderGmRankings(){
   const el = by("gmRankings");
   el.innerHTML = "";
-  teams.map(t=>({t, s: deriveGmScore(t)}))
+  DATA.teams
+    .map(t=>({t, s: deriveGmScore(t)}))
     .sort((a,b)=>b.s-a.s)
     .slice(0,10)
     .forEach((r, idx)=>{
@@ -442,7 +761,7 @@ function renderGmRankings(){
         <div class="top">
           <div>
             <div class="nm">#${idx+1} • ${r.t.name}</div>
-            <div class="meta">GM Score uses health + dead money + concentration</div>
+            <div class="meta">Score = health + (low dead money) + (lower concentration)</div>
           </div>
           <div class="money">${r.s}/100</div>
         </div>
@@ -459,18 +778,18 @@ function renderGmRankings(){
 function renderCompareTray(){
   const el = by("compareTray");
   el.innerHTML = "";
-  by("compareCount").textContent = `${local.comparePins.length} pinned`;
+  by("compareCount").textContent = `${state.comparePins.length} pinned`;
 
-  if(local.comparePins.length === 0){
+  if(state.comparePins.length === 0){
     const empty = document.createElement("div");
     empty.className = "item";
-    empty.innerHTML = `<div class="nm">No teams pinned</div><div class="meta">Toggle Compare and click teams to pin.</div>`;
+    empty.innerHTML = `<div class="nm">No teams pinned</div><div class="meta">Toggle Compare and click teams to pin them here.</div>`;
     el.appendChild(empty);
     return;
   }
 
-  local.comparePins
-    .map(id=>teams.find(t=>t.id===id))
+  state.comparePins
+    .map(id => DATA.teams.find(t=>t.id===id))
     .filter(Boolean)
     .forEach(t=>{
       const adj = computeSimAdjusted(t);
@@ -497,14 +816,14 @@ function renderCompareTray(){
 function renderAlerts(){
   const el = by("alertsList");
   el.innerHTML = "";
-  if(local.alerts.length === 0){
+  if(state.alerts.length === 0){
     const empty = document.createElement("div");
     empty.className = "item";
-    empty.innerHTML = `<div class="nm">No alerts yet</div><div class="meta">Follow teams or simulate moves to generate updates.</div>`;
+    empty.innerHTML = `<div class="nm">No alerts yet</div><div class="meta">Follow teams/free agents and simulate moves to generate updates.</div>`;
     el.appendChild(empty);
     return;
   }
-  local.alerts.slice(0,12).forEach(a=>{
+  state.alerts.slice(0,12).forEach(a=>{
     const dt = new Date(a.ts);
     const div = document.createElement("div");
     div.className = "item";
@@ -526,15 +845,15 @@ let compareMode = false;
 by("toggleCompare").addEventListener("click", ()=>{
   compareMode = !compareMode;
   by("toggleCompare").textContent = `Compare: ${compareMode ? "On" : "Off"}`;
-  toast("Compare mode", compareMode ? "Click a team row to pin/unpin." : "Compare is off.");
+  toast("Compare mode", compareMode ? "Click a team header to pin/unpin." : "Compare is off.");
 });
 
 by("resetLocal").addEventListener("click", ()=>{
   localStorage.removeItem(STORAGE_KEY);
-  local = { follows:{teams:{},players:{},freeAgents:{}}, comparePins:[], alerts:[], sim:{} };
-  saveLocal(local);
+  state = { follows:{teams:{},freeAgents:{}}, comparePins:[], alerts:[], sim:{} };
+  saveState(state);
   toast("Reset", "Local follows/pins/sim cleared.");
-  renderCompareTray(); renderAlerts(); renderTeams(); renderFreeAgents();
+  renderAll();
 });
 
 function renderTeams(){
@@ -544,28 +863,29 @@ function renderTeams(){
   const q = by("search").value.trim().toLowerCase();
   const filter = by("filterCap").value;
 
-  let list = teams.map(t=>{
+  let teams = DATA.teams.map(t=>{
     const adj = computeSimAdjusted(t);
     return { ...t, _adj: adj };
   });
 
   if(q){
-    list = list.filter(t=>{
-      const topCapPlayers = (t.topCapHitsPlayerIds || []).map(id=>playerById(id)?.name || "").join(" ");
-      const decisionPlayers = (t.decisions || []).map(d=>playerById(d.playerId)?.name || "").join(" ");
-      const hay = [t.name, topCapPlayers, decisionPlayers, ...(t.needs||[])].join(" ").toLowerCase();
+    teams = teams.filter(t=>{
+      const topPlayers = (t.topCapHitsPlayerIds||[]).map(id=>playerById(id)?.name || "").join(" ");
+      const decisionPlayers = (t.decisions||[]).map(d=>playerById(d.playerId)?.name || "").join(" ");
+      const hay = [t.name, topPlayers, decisionPlayers, ...(t.needs||[])].join(" ").toLowerCase();
       return hay.includes(q);
     });
   }
+
   if(filter !== "all"){
-    list = list.filter(t=>capHealthBucket(t._adj.capHealthScore) === filter);
+    teams = teams.filter(t=>capHealthBucket(t._adj.capHealthScore) === filter);
   }
 
-  by("teamCount").textContent = `${list.length} teams`;
+  by("teamCount").textContent = `${teams.length} teams`;
 
-  list.forEach(t=>{
-    const followed = !!local.follows.teams[t.id];
-    const pinned = local.comparePins.includes(t.id);
+  teams.forEach(t=>{
+    const followed = !!state.follows.teams[t.id];
+    const pinned = state.comparePins.includes(t.id);
     const adj = t._adj;
 
     const details = document.createElement("details");
@@ -574,7 +894,7 @@ function renderTeams(){
     const summary = document.createElement("summary");
     summary.innerHTML = `
       <div>
-        <div style="font-weight:900">${t.name}</div>
+        <div class="teamName">${t.name}</div>
         <div class="small muted">Space ${fmtMoney(adj.capSpace)} • Dead ${fmtMoney(adj.deadMoney)} • Rollover ${fmtMoney(t.rollover)}</div>
       </div>
       <div class="summaryRight">
@@ -583,17 +903,19 @@ function renderTeams(){
         <button class="tagBtn ${pinned ? "on":""}" data-pin="${t.id}">${pinned ? "Pinned" : "Pin"}</button>
       </div>
     `;
+
     summary.querySelectorAll("button").forEach(b=>{
       b.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); });
     });
 
     summary.querySelector(`[data-follow="${t.id}"]`).addEventListener("click", ()=>{
       toggleFollowTeam(t.id);
-      addAlert("follow", "Team follow updated", `${t.name} is now ${local.follows.teams[t.id] ? "followed" : "unfollowed"}.`);
+      addAlert("follow", "Team follow updated", `${t.name} is now ${state.follows.teams[t.id] ? "followed" : "unfollowed"}.`);
     });
+
     summary.querySelector(`[data-pin="${t.id}"]`).addEventListener("click", ()=>{
       togglePin(t.id);
-      addAlert("compare", "Compare tray updated", `${t.name} was ${local.comparePins.includes(t.id) ? "pinned" : "unpinned"}.`);
+      addAlert("compare", "Compare tray updated", `${t.name} was ${state.comparePins.includes(t.id) ? "pinned" : "unpinned"}.`);
     });
 
     summary.addEventListener("click", (e)=>{
@@ -606,7 +928,7 @@ function renderTeams(){
     const body = document.createElement("div");
     body.className = "teamBody";
 
-    const topCapPlayers = (t.topCapHitsPlayerIds || []).map(id=>playerById(id)).filter(Boolean).slice(0,3);
+    const topPlayers = (t.topCapHitsPlayerIds || []).map(id=>playerById(id)).filter(Boolean).slice(0,3);
 
     body.innerHTML = `
       <div class="twoCol">
@@ -615,7 +937,7 @@ function renderTeams(){
           <table class="table">
             <thead><tr><th>Player</th><th>Pos</th><th class="right">Cap Hit</th></tr></thead>
             <tbody>
-              ${topCapPlayers.map(p=>`
+              ${topPlayers.map(p=>`
                 <tr>
                   <td>
                     <div class="avatarRow">
@@ -630,7 +952,7 @@ function renderTeams(){
                   <td>${p.pos}</td>
                   <td class="right" style="font-family:var(--mono)">${fmtMoney(p.capHit || 0)}</td>
                 </tr>
-              `).join("") || `<tr><td colspan="3" class="muted">Add topCapHitsPlayerIds in teams.json</td></tr>`}
+              `).join("")}
             </tbody>
           </table>
         </div>
@@ -663,7 +985,7 @@ function renderTeams(){
                     <td class="right" style="font-family:var(--mono)">${impact}</td>
                   </tr>
                 `;
-              }).join("") || `<tr><td colspan="3" class="muted">Add decisions[] in teams.json</td></tr>`}
+              }).join("")}
             </tbody>
           </table>
         </div>
@@ -673,7 +995,7 @@ function renderTeams(){
         <div class="mini">
           <h3>Top 3 Needs</h3>
           <div class="chips">
-            ${(t.needs || []).slice(0,3).map(n=>`<span class="chip">${n}</span>`).join("") || `<span class="chip">Add needs[]</span>`}
+            ${(t.needs || []).slice(0,3).map(n=>`<span class="chip">${n}</span>`).join("")}
           </div>
 
           <div class="hr"></div>
@@ -690,41 +1012,42 @@ function renderTeams(){
                   <td class="right" style="font-family:var(--mono)">${fmtMoney(p.dead)}</td>
                   <td class="right" style="font-family:var(--mono)">${fmtMoney(p.space)}</td>
                 </tr>
-              `).join("") || `<tr><td colspan="5" class="muted">Add projection[] in teams.json</td></tr>`}
+              `).join("")}
             </tbody>
           </table>
         </div>
 
         <div class="mini">
           <h3>Cap Simulator</h3>
-          <div class="note">Local-only sandbox: Cut/Restructure/Extend adds cap space (+). Franchise subtracts (−).</div>
+          <div class="note"><b>Local sandbox:</b> Cut/Restructure/Extend adds cap space (+). Franchise subtracts (−).</div>
 
-          <div style="display:grid; grid-template-columns: 1.2fr .8fr .8fr; gap:10px; align-items:end; margin-top:10px;">
-            <div>
-              <div class="meta">Move Type</div>
-              <select data-move="${t.id}" style="width:100%; min-width:unset">
+          <div class="simRow">
+            <div class="field">
+              <label>Move Type</label>
+              <select data-move="${t.id}">
                 <option>Cut</option>
                 <option>Restructure</option>
                 <option>Extend</option>
                 <option>Franchise</option>
               </select>
             </div>
-            <div>
-              <div class="meta">Value (M)</div>
-              <input data-val="${t.id}" type="number" step="0.1" placeholder="e.g. 12.5"
-                style="width:100%; min-width:unset; background: rgba(16,24,39,.85); border:1px solid rgba(31,43,68,.9); color:var(--text); padding:10px 12px; border-radius:12px; outline:none;" />
+            <div class="field">
+              <label>Value (cap change)</label>
+              <input data-val="${t.id}" type="number" step="0.1" placeholder="e.g. 12.5"/>
             </div>
-            <button class="btn" data-apply="${t.id}" style="width:100%;">Apply</button>
+            <div class="field">
+              <button class="btn" data-apply="${t.id}" style="width:100%;">Apply Move</button>
+            </div>
           </div>
 
           <div class="hr"></div>
 
-          <div class="row" style="justify-content:space-between">
-            <div class="small muted">Local Moves</div>
+          <div class="sectionTitle">
+            <span>Local Moves</span>
             <span class="pill">${(adj.moves||[]).length} moves</span>
           </div>
           <div class="list">
-            ${(adj.moves||[]).slice(0,6).map((m,i)=>`
+            ${(adj.moves||[]).slice(0,6).map((m, i)=>`
               <div class="item">
                 <div class="top">
                   <div>
@@ -749,43 +1072,46 @@ function renderTeams(){
     details.appendChild(body);
     el.appendChild(details);
 
-    // Simulator handlers
+    // Hook simulator
     body.querySelector(`[data-apply="${t.id}"]`).addEventListener("click", ()=>{
       const moveType = body.querySelector(`[data-move="${t.id}"]`).value;
       const rawVal = parseFloat(body.querySelector(`[data-val="${t.id}"]`).value);
-      if(!isFinite(rawVal) || rawVal === 0){
+      if(!isFinite(rawVal) || rawVal===0){
         toast("Invalid value", "Enter a number like 12.5");
         return;
       }
       const value = Math.abs(rawVal);
+
+      // dead money estimate
       const dead = (moveType==="Cut") ? +(value*0.55).toFixed(1)
                : (moveType==="Restructure") ? +(value*0.25).toFixed(1)
                : 0;
 
       const move = {
         type: moveType,
-        value: +value.toFixed(1),
+        value: +(value.toFixed(1)),
         dead,
-        note: moveType==="Franchise" ? "Applied franchise tag (local)" :
-              moveType==="Cut" ? "Released player (local)" :
-              moveType==="Restructure" ? "Converted salary to bonus (local)" :
-              "Extension smoothing cap hits (local)"
+        note: moveType==="Franchise" ? "Applied franchise tag (demo)" :
+              moveType==="Cut" ? "Released player (demo)" :
+              moveType==="Restructure" ? "Converted salary to bonus (demo)" :
+              "Extension smoothing cap hits (demo)"
       };
 
-      if(!local.sim[t.id]) local.sim[t.id] = [];
-      local.sim[t.id].unshift(move);
-      local.sim[t.id] = local.sim[t.id].slice(0, 20);
-      saveLocal(local);
+      if(!state.sim[t.id]) state.sim[t.id]=[];
+      state.sim[t.id].unshift(move);
+      state.sim[t.id] = state.sim[t.id].slice(0, 20);
+      saveState(state);
 
-      if(local.follows.teams[t.id]){
+      if(state.follows.teams[t.id]){
         const verb = moveType==="Franchise" ? "costs" : "saves";
         addAlert("cap", `${t.name} cap move`, `${moveType} ${verb} ${fmtMoney(move.value)} (dead change ${fmtMoney(move.dead)}).`);
       } else {
         toast("Move applied", `${t.name}: ${moveType} ${moveType==="Franchise" ? "−" : "+"}${fmtMoney(move.value)}`);
       }
 
-      renderCompareTray();
       renderTeams();
+      renderLeague();
+      renderCompareTray();
       renderGmRankings();
     });
 
@@ -793,41 +1119,31 @@ function renderTeams(){
       btn.addEventListener("click", ()=>{
         const [teamId, idxStr] = btn.getAttribute("data-delmove").split(":");
         const idx = parseInt(idxStr,10);
-        if(local.sim[teamId]) local.sim[teamId].splice(idx,1);
-        saveLocal(local);
+        if(state.sim[teamId]) state.sim[teamId].splice(idx,1);
+        saveState(state);
         toast("Removed", `${t.name}: removed move.`);
-        renderCompareTray();
         renderTeams();
+        renderLeague();
+        renderCompareTray();
         renderGmRankings();
       });
     });
   });
 }
 
+function renderAll(){
+  renderLeague();
+  renderFreeAgents();
+  renderCompareTray();
+  renderAlerts();
+  renderGmRankings();
+  renderTeams();
+}
+
 by("search").addEventListener("input", ()=>renderTeams());
 by("filterCap").addEventListener("change", ()=>renderTeams());
 
-async function init(){
-  try{
-    league = await loadJson("./data/league.json");
-    teams = await loadJson("./data/teams.json");
-    players = await loadJson("./data/players.json");
-    freeAgents = await loadJson("./data/free_agents.json");
-
-    renderLeague();
-    renderFreeAgents();
-    renderCompareTray();
-    renderAlerts();
-    renderGmRankings();
-    renderTeams();
-  }catch(err){
-    console.error(err);
-    toast("Data load failed", err.message || "Check your /data/*.json files exist.");
-    by("lastUpdated").textContent = "error";
-  }
-}
-
-init();
+renderAll();
 </script>
 </body>
 </html>
